@@ -1,0 +1,52 @@
+# Maintainer: memreduct-linux contributors
+
+pkgname=memreduct-linux
+pkgver=0.1.0
+pkgrel=1
+pkgdesc="Real-time Memory Monitor & Optimizer for CachyOS / Linux"
+arch=('x86_64' 'aarch64')
+url="https://github.com/memreduct-linux/memreduct-linux"
+license=('GPL-3.0-or-later')
+depends=('gtk4' 'libadwaita' 'polkit' 'dbus' 'hicolor-icon-theme')
+makedepends=('cargo')
+options=('!lto')
+
+build() {
+    cd "$startdir/../.."
+    cargo build --release --locked --workspace
+}
+
+check() {
+    cd "$startdir/../.."
+    cargo test --release --locked --workspace
+}
+
+package() {
+    cd "$startdir/../.."
+    # Binaries
+    install -Dm755 target/release/memreductd "${pkgdir}/usr/bin/memreductd"
+    install -Dm755 target/release/memreduct-cli "${pkgdir}/usr/bin/memreduct-cli"
+    install -Dm755 target/release/memreduct-gui "${pkgdir}/usr/bin/memreduct-gui"
+
+    # Systemd daemon service
+    install -Dm644 data/memreductd.service "${pkgdir}/usr/lib/systemd/system/memreductd.service"
+
+    # D-Bus system activation & configuration
+    install -Dm644 data/org.memreduct.Daemon.service "${pkgdir}/usr/share/dbus-1/system-services/org.memreduct.Daemon.service"
+    install -Dm644 data/org.memreduct.Daemon.conf "${pkgdir}/usr/share/dbus-1/system.d/org.memreduct.Daemon.conf"
+
+    # Polkit authorization action
+    install -Dm644 data/org.memreduct.policy "${pkgdir}/usr/share/polkit-1/actions/org.memreduct.policy"
+
+    # Desktop entry
+    install -Dm644 data/memreduct.desktop "${pkgdir}/usr/share/applications/memreduct.desktop"
+
+    # Icons
+    install -Dm644 data/icons/hicolor/scalable/apps/memreduct.svg "${pkgdir}/usr/share/icons/hicolor/scalable/apps/memreduct.svg"
+    install -Dm644 data/icons/hicolor/symbolic/apps/memreduct-symbolic.svg "${pkgdir}/usr/share/icons/hicolor/symbolic/apps/memreduct-symbolic.svg"
+
+    # Documentation & License
+    install -Dm644 LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+    install -Dm644 NOTICE "${pkgdir}/usr/share/licenses/${pkgname}/NOTICE"
+    install -Dm644 README.md "${pkgdir}/usr/share/doc/${pkgname}/README.md"
+}

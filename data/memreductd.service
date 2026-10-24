@@ -1,0 +1,18 @@
+[Unit]
+Description=Memory Reduct System Daemon for CachyOS/Linux
+Documentation=https://github.com/memreduct-linux/memreduct-linux
+After=network.target dbus.service
+Wants=dbus.service
+
+[Service]
+Type=dbus
+BusName=org.memreduct.Daemon
+ExecStart=/usr/bin/memreductd
+Restart=on-failure
+RestartSec=5s
+ProtectHome=true
+ProtectSystem=strict
+ReadWritePaths=/proc/sys/vm /sys/fs/cgroup
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,11 @@
+memreduct-linux
+Copyright (c) 2026 memreduct-linux contributors
+
+This project is a clean-room Rust implementation of a real-time memory monitor
+and optimizer for Linux (specifically CachyOS / Arch-based distributions),
+conceptually inspired by Mem Reduct for Windows:
+https://github.com/henrypp/memreduct
+Copyright (c) 2011-2026 Henry++
+
+Licensed under the GNU General Public License v3.0 or later (GPL-3.0-or-later).
+No code from the original Windows C implementation was copied.

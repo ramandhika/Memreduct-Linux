@@ -1,0 +1,5 @@
+[D-BUS Service]
+Name=org.memreduct.Daemon
+Exec=/usr/bin/memreductd
+User=root
+SystemdService=memreductd.service

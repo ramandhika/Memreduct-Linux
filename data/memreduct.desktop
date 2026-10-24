@@ -1,0 +1,19 @@
+[Desktop Entry]
+Name=Mem Reduct
+GenericName=Memory Optimizer
+GenericName[id]=Pengoptimal Memori
+Comment=Real-time Memory Monitor & Optimizer for CachyOS / Linux
+Comment[id]=Pemantau dan Pengoptimal Memori Real-time untuk CachyOS / Linux
+Exec=memreduct-gui
+Icon=memreduct
+Terminal=false
+Type=Application
+Categories=System;Monitor;
+Keywords=memory;ram;cleaner;optimizer;reduct;swap;zram;
+StartupNotify=true
+Actions=Reduce;
+
+[Desktop Action Reduce]
+Name=Reduce Memory Now
+Name[id]=Bersihkan Memori Sekarang
+Exec=memreduct-cli reduce --mode reclaim

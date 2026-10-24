@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE policyconfig PUBLIC "-//freedesktop//DTD PolicyKit Policy Configuration 1.0//EN"
+ "http://www.freedesktop.org/standards/PolicyKit/1/policyconfig.dtd">
+<policyconfig>
+  <vendor>memreduct-linux</vendor>
+  <vendor_url>https://github.com/memreduct-linux/memreduct-linux</vendor_url>
+
+  <action id="org.memreduct.reduce">
+    <description>Perform system memory reduction</description>
+    <description xml:lang="id">Jalankan optimasi dan pembersihan memori sistem</description>
+    <message>Authentication is required to perform system memory reduction</message>
+    <message xml:lang="id">Otentikasi diperlukan untuk membersihkan memori sistem</message>
+    <defaults>
+      <allow_any>auth_admin</allow_any>
+      <allow_inactive>auth_admin</allow_inactive>
+      <allow_active>auth_admin_keep</allow_active>
+    </defaults>
+  </action>
+</policyconfig>
