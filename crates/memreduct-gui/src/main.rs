@@ -34,6 +34,13 @@ fn main() -> glib::ExitCode {
 
     info!("Starting memreduct-gui");
 
+    // Initialize Tokio runtime so zbus and async I/O have a running reactor context
+    let rt = tokio::runtime::Builder::new_multi_thread()
+        .enable_all()
+        .build()
+        .expect("Failed to initialize Tokio runtime");
+    let _rt_guard = rt.enter();
+
     let app = adw::Application::builder().application_id(APP_ID).build();
 
     let use_session = std::env::args().any(|a| a == "--session");
@@ -101,6 +108,7 @@ fn main() -> glib::ExitCode {
         let tray_handle_timer = tray_handle.clone();
         let rx_tray_timer = rx_tray_cell.clone();
         let config_timer = config.clone();
+        let tick_count = Rc::new(RefCell::new(0u32));
 
         // 1-second periodic tick
         glib::timeout_add_seconds_local(1, move || {
@@ -197,12 +205,16 @@ fn main() -> glib::ExitCode {
             }
 
             // Check daemon connectivity every 5 ticks
-            let banner_w = widgets_timer.daemon_banner.clone();
-            let client_check = client_timer.clone();
-            glib::MainContext::default().spawn_local(async move {
-                let available = client_check.is_daemon_available().await;
-                banner_w.set_revealed(!available);
-            });
+            let mut ticks = tick_count.borrow_mut();
+            *ticks += 1;
+            if *ticks % 5 == 1 {
+                let banner_w = widgets_timer.daemon_banner.clone();
+                let client_check = client_timer.clone();
+                glib::MainContext::default().spawn_local(async move {
+                    let available = client_check.is_daemon_available().await;
+                    banner_w.set_revealed(!available);
+                });
+            }
 
             glib::ControlFlow::Continue
         });

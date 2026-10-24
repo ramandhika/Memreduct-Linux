@@ -20,10 +20,9 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     info!("Starting memreductd v{}", env!("CARGO_PKG_VERSION"));
 
-    let service = DaemonService::new();
-
     // Check if --session flag is passed (useful for dev/test without root)
     let use_session_bus = std::env::args().any(|arg| arg == "--session");
+    let service = DaemonService::new(use_session_bus);
 
     let _conn = if use_session_bus {
         info!("Connecting to D-Bus SESSION bus (development mode)");

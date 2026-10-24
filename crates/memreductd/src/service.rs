@@ -13,12 +13,14 @@ use crate::polkit::{check_polkit_auth, ACTION_REDUCE};
 
 pub struct DaemonService {
     executor: Mutex<Executor>,
+    is_session_mode: bool,
 }
 
 impl DaemonService {
-    pub fn new() -> Self {
+    pub fn new(is_session_mode: bool) -> Self {
         Self {
             executor: Mutex::new(Executor::new()),
+            is_session_mode,
         }
     }
 }
@@ -43,19 +45,23 @@ impl DaemonService {
             fdo::Error::InvalidArgs(format!("Invalid reduction mode '{mode_str}': {e}"))
         })?;
 
-        // 1. Authorize with Polkit
-        let mut details = HashMap::new();
-        details.insert("mode", mode.as_str());
+        // 1. Authorize with Polkit (or bypass in local session test mode)
+        if !self.is_session_mode {
+            let mut details = HashMap::new();
+            details.insert("mode", mode.as_str());
 
-        let authorized = check_polkit_auth(conn, sender, ACTION_REDUCE, details)
-            .await
-            .map_err(|e| fdo::Error::Failed(format!("Polkit communication error: {e}")))?;
+            let authorized = check_polkit_auth(conn, sender, ACTION_REDUCE, details)
+                .await
+                .map_err(|e| fdo::Error::Failed(format!("Polkit communication error: {e}")))?;
 
-        if !authorized {
-            warn!("Polkit rejected Reduce request from {sender}");
-            return Err(fdo::Error::AccessDenied(
-                "Authorization rejected by Polkit".into(),
-            ));
+            if !authorized {
+                warn!("Polkit rejected Reduce request from {sender}");
+                return Err(fdo::Error::AccessDenied(
+                    "Authorization rejected by Polkit".into(),
+                ));
+            }
+        } else {
+            info!("Session test mode active: skipping Polkit check for sender {sender}");
         }
 
         // 2. Execute reduction logic under lock

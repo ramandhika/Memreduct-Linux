@@ -119,7 +119,7 @@ pub fn create_main_window(
 
     // --- Swap & zram Section ---
     let swap_group = PreferencesGroup::builder()
-        .title("Swap & zram (CachyOS)")
+        .title("Swap &amp; zram (CachyOS)")
         .build();
 
     let swap_level = LevelBar::builder()
